@@ -582,6 +582,7 @@ func CleanupLeftovers(ipt utiliptables.Interface) (encounteredError bool) {
 		err = ipt.Restore(utiliptables.TableNAT, natLines, utiliptables.NoFlushTables, utiliptables.RestoreCounters)
 		if err != nil {
 			glog.Errorf("Failed to execute iptables-restore for %s: %v", utiliptables.TableNAT, err)
+			glog.V(5).Infof("Data passed to iptables: %s", string(natLines))
 			encounteredError = true
 		}
 	}
@@ -608,6 +609,7 @@ func CleanupLeftovers(ipt utiliptables.Interface) (encounteredError bool) {
 		// Write it.
 		if err := ipt.Restore(utiliptables.TableFilter, filterLines, utiliptables.NoFlushTables, utiliptables.RestoreCounters); err != nil {
 			glog.Errorf("Failed to execute iptables-restore for %s: %v", utiliptables.TableFilter, err)
+			glog.V(5).Infof("Data passed to iptables: %s", string(filterLines))
 			encounteredError = true
 		}
 	}
@@ -1665,6 +1667,7 @@ func (proxier *Proxier) syncProxyRules() {
 	err = proxier.iptables.RestoreAll(proxier.iptablesData.Bytes(), utiliptables.NoFlushTables, utiliptables.RestoreCounters)
 	if err != nil {
 		glog.Errorf("Failed to execute iptables-restore: %v", err)
+		glog.V(5).Infof("Data passed to iptables: %s", string(proxier.iptablesData.Bytes()))
 		// Revert new local ports.
 		glog.V(2).Infof("Closing local ports after iptables-restore failure")
 		utilproxy.RevertPorts(replacementPortsMap, proxier.portsMap)
